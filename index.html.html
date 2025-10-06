@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Happy Birthday Kallu 🎉</title>
+  <style>
+    :root{--bg:#0b1220;--accent:#ffdd57;--muted:#b8c1c9}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    body{background:linear-gradient(180deg,#071026 0%, #071a2e 60%);color:var(--muted);display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{width:960px;max-width:100%;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));border-radius:18px;box-shadow:0 8px 40px rgba(2,6,23,0.7);overflow:hidden;position:relative}
+
+    .main{display:grid;grid-template-columns:1fr;gap:24px;padding:28px}
+
+    .stage{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0));border-radius:12px;padding:28px;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+
+    .balloons{position:absolute;inset:0;pointer-events:none}
+    .balloon{position:absolute;width:80px;height:110px;border-radius:50% 50% 48% 48%/60% 60% 40% 40%;transform-origin:center bottom}
+
+    .controls{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+    button{background:linear-gradient(180deg,var(--accent),#ffb347);border:0;padding:12px 18px;border-radius:10px;cursor:pointer;font-weight:700}
+
+    .surprise{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(180deg, rgba(2,6,23,0.85), rgba(2,6,23,0.9));backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .7s}
+    .surprise.show{opacity:1;pointer-events:auto}
+    .surprise-card{background:linear-gradient(90deg,#1b2733,#102233);padding:28px;border-radius:14px;box-shadow:0 10px 40px rgba(2,6,23,0.8);text-align:center;color:white;max-width:720px}
+    .surprise h2{margin:0 0 8px;font-size:34px}
+    .surprise p{margin:0 0 18px;font-size:18px;color:#dfe9f1}
+
+    canvas{position:absolute;inset:0;pointer-events:none}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="main">
+      <section class="stage">
+        <div class="balloons"></div>
+        <canvas id="confetti-canvas"></canvas>
+
+        <div id="center-content">
+          <div class="controls">
+            <button id="openBtn">Open Surprise 🎉</button>
+          </div>
+        </div>
+
+        <div id="surprise" class="surprise" role="dialog" aria-hidden="true">
+          <div class="surprise-card">
+            <h2 id="surpriseTitle">Happy Birthday, Malavika K.S. ! 🎂</h2>
+            <p id="surpriseMessage">My so-called Kallu, Chakkare, you are the most favorite person of mine. Whatever happens, know that I'm with you, and I know you're with me too. I love you to the moon and back, Kallumma! 💋❤</p>
+            <div style="margin-top:18px;display:flex;gap:12px;justify-content:center">
+              <button id="closeBtn">Close</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const openBtn = document.getElementById('openBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const surprise = document.getElementById('surprise');
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas(){ canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+    let confettiPieces = [];
+    function makePieces(count){ for(let i=0;i<count;i++){ confettiPieces.push({x:Math.random()*canvas.width, y:Math.random()*-canvas.height, vx:(Math.random()-0.5)*4, vy:2+Math.random()*4, r:6+Math.random()*8, c: ['#ffd166','#ef476f','#06d6a0','#118ab2'][Math.floor(Math.random()*4)], rot:Math.random()*360, vr:(Math.random()-0.5)*8 }) } }
+    function burstConfetti(){ confettiPieces = []; makePieces(140); }
+
+    function confettiLoop(){ ctx.clearRect(0,0,canvas.width,canvas.height); for(let p of confettiPieces){ p.x += p.vx; p.y += p.vy; p.vy += 0.06; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180); ctx.fillStyle = p.c; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6); ctx.restore(); p.rot += p.vr; } confettiPieces = confettiPieces.filter(p=>p.y < canvas.height+50); requestAnimationFrame(confettiLoop);} confettiLoop();
+
+    // Balloon animation
+    const balloonsContainer = document.querySelector('.balloons');
+    function createBalloons(){ const colors = ['#ff6b6b','#ffd166','#6bc1ff','#c8a2ff']; for(let i=0;i<8;i++){ const el = document.createElement('div'); el.className='balloon'; el.style.left = (5 + Math.random()*90) + '%'; el.style.bottom = (-60 - Math.random()*120) + 'px'; el.style.width = (60 + Math.random()*80) + 'px'; el.style.height = (80 + Math.random()*120) + 'px'; el.style.background = colors[i%colors.length]; el.style.opacity = 0.95; balloonsContainer.appendChild(el); animateBalloon(el); } }
+    function animateBalloon(el){ const delay = Math.random()*3000; setTimeout(()=>{ const vy = 5000 + Math.random()*8000; el.animate([{transform:'translateY(0)'},{transform:`translateY(-${vy}px)`}],{duration:vy*3,easing:'linear',iterations:1,fill:'forwards'}); }, Math.random()*1200); }
+    createBalloons();
+
+    openBtn.addEventListener('click', ()=>{ surprise.classList.add('show'); surprise.setAttribute('aria-hidden','false'); burstConfetti(); });
+    closeBtn.addEventListener('click', ()=>{ surprise.classList.remove('show'); surprise.setAttribute('aria-hidden','true'); });
+  </script>
+</body>
+</html>
